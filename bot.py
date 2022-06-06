@@ -1,24 +1,22 @@
-import os
 import asyncio
 import datetime
 import requests
-import dotenv
 import discord
 import html2text
 
-dotenv.load_dotenv()
-channel_id = int(os.getenv('CHANNEL_ID'))
-WHEN = datetime.time(12, 0, 0)
-wishlist_url = os.getenv('WISHLIST_URL')
 
-client = discord.Client()
-
-
-def readToken():
+def readHeader(header):
     with open('.env', 'r') as f:
         for line in f.readlines():
-            if 'DISCORD_TOKEN' in line:
-                return line.replace('DISCORD_TOKEN=', '').replace(' ', '')
+            if header in line:
+                return line.replace(f'{header}=', '').replace(' ', '')
+
+
+channel_id = int(readHeader('CHANNEL_ID'))
+WHEN = datetime.time(12, 0, 0)
+wishlist_url = readHeader('WISHLIST_URL')
+
+client = discord.Client()
 
 
 @client.event
@@ -66,6 +64,6 @@ def read_html():
 
 
 if __name__ == '__main__':
-    TOKEN = readToken()
+    TOKEN = readHeader('DISCORD_TOKEN')
     client.loop.create_task(timer_task())
     client.run(TOKEN)
