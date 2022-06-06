@@ -6,7 +6,7 @@ import html2text
 
 
 def readHeader(header):
-    with open('.env', 'r') as f:
+    with open('env.txt', 'r') as f:
         for line in f.readlines():
             if header in line:
                 return line.replace(f'{header}=', '').replace(' ', '')
