@@ -1,4 +1,7 @@
-discord.py
+os
 asyncio
+datetime
 requests
 dotenv
+discord.py
+html2text
