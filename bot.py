@@ -1,16 +1,24 @@
-import os, asyncio
-from datetime import datetime, timedelta, time
+import os
+import asyncio
+import datetime
 import requests
-from dotenv import load_dotenv
-import discord, html2text
+import dotenv
+import discord
+import html2text
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+dotenv.load_dotenv()
 channel_id = int(os.getenv('CHANNEL_ID'))
-WHEN = time(12, 0, 0)
+WHEN = datetime.time(12, 0, 0)
 wishlist_url = os.getenv('WISHLIST_URL')
 
 client = discord.Client()
+
+
+def readToken():
+    with open('.env', 'r') as f:
+        for line in f.readlines():
+            if 'DISCORD_TOKEN' in line:
+                return line.replace('DISCORD_TOKEN=', '').replace(' ', '')
 
 
 @client.event
@@ -21,22 +29,23 @@ async def on_ready():
 async def daily_msg():
     await client.wait_until_ready()
     channel = client.get_channel(channel_id)
-    await channel.send(f'@everyone\nAktueller Preis **{read_html()}€**\n*Am: [{datetime.today().strftime("%d:%M:%Y")}]*')
+    await channel.send(f'@everyone\nAktueller Preis **{read_html()}€**' +
+                       f'\n*Am: [{datetime.datetime.today().strftime("%d:%M:%Y")}]*')
 
 
 async def halt_Task(now):
-    tomorrow = datetime.combine(now.date() + timedelta(days=1), time(0))
+    tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
     seconds = (tomorrow - now).total_seconds()
     await asyncio.sleep(seconds)
 
 
 async def timer_task():
-    now = datetime.now()
+    now = datetime.datetime.now()
     if now.time() > WHEN:
         await halt_Task(now)
     while True:
-        now = datetime.now()
-        target_time = datetime.combine(now.date(), WHEN)
+        now = datetime.datetime.now()
+        target_time = datetime.datetime.combine(now.date(), WHEN)
         seconds_until_target = (target_time - now).total_seconds()
         await asyncio.sleep(seconds_until_target)
         await daily_msg()
@@ -57,5 +66,6 @@ def read_html():
 
 
 if __name__ == '__main__':
+    TOKEN = readToken()
     client.loop.create_task(timer_task())
     client.run(TOKEN)
