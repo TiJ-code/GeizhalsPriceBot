@@ -1,5 +1,4 @@
 asyncio
 requests
-dotenv
 discord.py
 html2text
